@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CompteurTaxi</string>
+
+    <!-- Main Screen -->
+    <string name="start_trip">Démarrer la Course</string>
+    <string name="stop_trip">Arrêter la Course</string>
+    <string name="reset_trip">Réinitialiser</string>
+    <string name="distance">Distance</string>
+    <string name="time">Temps</string>
+    <string name="total_fare">Tarif Total</string>
+    <string name="km">km</string>
+    <string name="min">min</string>
+    <string name="dh">DH</string>
+
+    <!-- Driver Profile -->
+    <string name="driver_profile">Profil du Chauffeur</string>
+    <string name="driver_name">Nom</string>
+    <string name="driver_age">Âge</string>
+    <string name="driver_license">Type de Permis</string>
+    <string name="years_old">ans</string>
+    <string name="scan_qr">Scanner le QR Code</string>
+    <string name="share_profile">Partager le Profil</string>
+
+    <!-- Notifications -->
+    <string name="trip_completed">Course Terminée</string>
+    <string name="trip_summary">Résumé de la Course</string>
+    <string name="notification_content">Distance: %1$.2f km | Temps: %2$d min | Tarif: %3$.2f DH</string>
+    <string name="trip_in_progress">Course en Cours</string>
+    <string name="current_fare">Tarif actuel: %1$.2f DH</string>
+
+    <!-- Permissions -->
+    <string name="location_permission_required">L\'autorisation de localisation est requise</string>
+    <string name="permission_denied">Permission refusée</string>
+    <string name="enable_location">Veuillez activer les services de localisation</string>
+
+    <!-- Rates -->
+    <string name="base_fare">Tarif de Base: %1$.2f DH</string>
+    <string name="per_km">Par KM: %1$.2f DH</string>
+    <string name="per_minute">Par Minute: %1$.2f DH</string>
+
+    <!-- Messages -->
+    <string name="trip_started">Course démarrée</string>
+    <string name="trip_stopped">Course arrêtée</string>
+    <string name="trip_reset">Course réinitialisée</string>
+    <string name="waiting_for_gps">En attente du signal GPS…</string>
+    <string name="gps_enabled">GPS activé</string>
+
+    <!-- Menu -->
+    <string name="menu_profile">Profil</string>
+    <string name="menu_settings">Paramètres</string>
+    <string name="menu_about">À propos</string>
+
+    <!-- Dialog -->
+    <string name="confirm_stop">Confirmer l\'Arrêt</string>
+    <string name="confirm_stop_message">Êtes-vous sûr de vouloir arrêter la course?</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Annuler</string>
+</resources>

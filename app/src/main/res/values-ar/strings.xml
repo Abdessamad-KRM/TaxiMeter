@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">عداد الأجرة</string>
+
+    <!-- Main Screen -->
+    <string name="start_trip">بدء الرحلة</string>
+    <string name="stop_trip">إيقاف الرحلة</string>
+    <string name="reset_trip">إعادة تعيين</string>
+    <string name="distance">المسافة</string>
+    <string name="time">الوقت</string>
+    <string name="total_fare">الأجرة الإجمالية</string>
+    <string name="km">كم</string>
+    <string name="min">دقيقة</string>
+    <string name="dh">درهم</string>
+
+    <!-- Driver Profile -->
+    <string name="driver_profile">ملف السائق</string>
+    <string name="driver_name">الاسم</string>
+    <string name="driver_age">العمر</string>
+    <string name="driver_license">نوع الرخصة</string>
+    <string name="years_old">سنة</string>
+    <string name="scan_qr">مسح رمز QR</string>
+    <string name="share_profile">مشاركة الملف</string>
+
+    <!-- Notifications -->
+    <string name="trip_completed">اكتملت الرحلة</string>
+    <string name="trip_summary">ملخص الرحلة</string>
+    <string name="notification_content">المسافة: %1$.2f كم | الوقت: %2$d دقيقة | الأجرة: %3$.2f درهم</string>
+    <string name="trip_in_progress">رحلة جارية</string>
+    <string name="current_fare">الأجرة الحالية: %1$.2f درهم</string>
+
+    <!-- Permissions -->
+    <string name="location_permission_required">إذن الموقع مطلوب</string>
+    <string name="permission_denied">تم رفض الإذن</string>
+    <string name="enable_location">يرجى تمكين خدمات الموقع</string>
+
+    <!-- Rates -->
+    <string name="base_fare">الأجرة الأساسية: %1$.2f درهم</string>
+    <string name="per_km">لكل كم: %1$.2f درهم</string>
+    <string name="per_minute">لكل دقيقة: %1$.2f درهم</string>
+
+    <!-- Messages -->
+    <string name="trip_started">بدأت الرحلة</string>
+    <string name="trip_stopped">توقفت الرحلة</string>
+    <string name="trip_reset">تمت إعادة تعيين الرحلة</string>
+    <string name="waiting_for_gps">في انتظار إشارة GPS…</string>
+    <string name="gps_enabled">تم تمكين GPS</string>
+
+    <!-- Menu -->
+    <string name="menu_profile">الملف الشخصي</string>
+    <string name="menu_settings">الإعدادات</string>
+    <string name="menu_about">حول</string>
+
+    <!-- Dialog -->
+    <string name="confirm_stop">تأكيد الإيقاف</string>
+    <string name="confirm_stop_message">هل أنت متأكد من رغبتك في إيقاف الرحلة؟</string>
+    <string name="yes">نعم</string>
+    <string name="no">لا</string>
+    <string name="ok">حسنا</string>
+    <string name="cancel">إلغاء</string>
+</resources>

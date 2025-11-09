@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Main Colors -->
+    <color name="taxi_yellow">#FFD700</color>
+    <color name="black">#000000</color>
+    <color name="light_gray">#D3D3D3</color>
+    <color name="white">#FFFFFF</color>
+    <color name="red">#FF0000</color>
+    <color name="blue">#007BFF</color>
+    <color name="green">#28A745</color>
+    <color name="light_blue">#E0F7FF</color>
+    <color name="dark_gray">#343A40</color>
+
+    <!-- Theme Colors -->
+    <color name="primary">#FFD700</color>
+    <color name="primary_dark">#FFC700</color>
+    <color name="accent">#007BFF</color>
+    <color name="background">#F5F5F5</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="text_primary">#000000</color>
+    <color name="text_secondary">#757575</color>
+
+    <!-- Status Colors -->
+    <color name="status_active">#28A745</color>
+    <color name="status_inactive">#FF0000</color>
+    <color name="status_warning">#FFA500</color>
+
+    <!-- Transparent -->
+    <color name="transparent">#00000000</color>
+    <color name="semi_transparent_black">#80000000</color>
+</resources>
