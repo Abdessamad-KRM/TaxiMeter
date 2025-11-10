@@ -37,6 +37,8 @@ import java.util.Calendar
 class MainActivity : AppCompatActivity(),
     EasyPermissions.PermissionCallbacks {
 
+    // (Le début de votre classe est inchangé... UI Components, Map, Location...)
+    // ...
     // UI Components
     private lateinit var tvTotalFare: TextView
     private lateinit var tvDistance: TextView
@@ -71,16 +73,12 @@ class MainActivity : AppCompatActivity(),
     private val timerHandler = Handler(Looper.getMainLooper())
     private var lastUpdateTime: Long = 0L
 
-    // MODIFIÉ 1: Le timer tourne TOUJOURS pour mettre à jour l'UI (Jour/Nuit)
     private val timerRunnable = object : Runnable {
         override fun run() {
-            // Cette partie calcule la course UNIQUEMENT si elle est active
             if (tripData.isActive) {
                 val currentTime = System.currentTimeMillis()
-                // Update total time
                 tripData.timeInSeconds = (currentTime - tripData.startTime) / 1000
 
-                // Check waiting mode based on speed
                 val shouldWait = tripData.shouldBeInWaitingMode(currentSpeed)
 
                 if (shouldWait && !tripData.isWaiting) {
@@ -97,11 +95,7 @@ class MainActivity : AppCompatActivity(),
 
                 lastUpdateTime = currentTime
             }
-
-            // Mettez à jour l'UI CHAQUE SECONDE (pour le mode jour/nuit)
             updateUI()
-
-            // Relancez le timer quoi qu'il arrive
             timerHandler.postDelayed(this, 1000)
         }
     }
@@ -119,14 +113,11 @@ class MainActivity : AppCompatActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // OSMdroid Configuration
         Configuration.getInstance().load(
             applicationContext,
             PreferenceManager.getDefaultSharedPreferences(applicationContext)
         )
         Configuration.getInstance().userAgentValue = packageName
-
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_main)
 
@@ -135,10 +126,7 @@ class MainActivity : AppCompatActivity(),
         setupOsmMap()
         setupLocationClient()
         setupListeners()
-        // MODIFIÉ 2: updateRatesDisplay() est supprimé d'ici
         notificationHelper = NotificationHelper(this)
-
-        // MODIFIÉ 3: Démarrer le timer global ici
         timerHandler.post(timerRunnable)
     }
 
@@ -190,7 +178,6 @@ class MainActivity : AppCompatActivity(),
 
     private fun setupLocationClient() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
         locationRequest = LocationRequest.Builder(
             Priority.PRIORITY_HIGH_ACCURACY,
             LOCATION_UPDATE_INTERVAL
@@ -205,7 +192,14 @@ class MainActivity : AppCompatActivity(),
                     currentSpeed = if (location.hasSpeed()) {
                         location.speed * 3.6f
                     } else {
-                        0f
+                        // Si le GPS ne donne pas de vitesse, on la calcule manuellement
+                        if (tripData.lastLocation != null && tripData.isActive) {
+                            val timeDiff = (location.time - tripData.lastLocation!!.time) / 1000f // en secondes
+                            val distDiff = DistanceCalculator.calculateDistance(tripData.lastLocation, location)
+                            if (timeDiff > 0) (distDiff / timeDiff) * 3.6f else 0f
+                        } else {
+                            0f
+                        }
                     }
                     onLocationUpdate(location)
                 }
@@ -214,15 +208,9 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun setupListeners() {
-        btnStart.setOnClickListener {
-            startTrip()
-        }
-        btnStop.setOnClickListener {
-            showStopConfirmationDialog()
-        }
-        btnReset.setOnClickListener {
-            resetTrip()
-        }
+        btnStart.setOnClickListener { startTrip() }
+        btnStop.setOnClickListener { showStopConfirmationDialog() }
+        btnReset.setOnClickListener { resetTrip() }
         btnProfile.setOnClickListener {
             startActivity(Intent(this, DriverProfileActivity::class.java))
         }
@@ -246,33 +234,21 @@ class MainActivity : AppCompatActivity(),
     }
 
     private fun enableMyLocation() {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            // Initialise votre curseur personnalisé
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locationOverlay = MyLocationOverlay(mapView)
             mapView.overlays.add(locationOverlay)
-
             getCurrentLocation()
             tvStatus.text = "PRÊT - GPS ACTIF"
         }
     }
 
     private fun getCurrentLocation() {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                 location?.let {
                     val currentGeoPoint = GeoPoint(it.latitude, it.longitude)
                     mapView.controller.animateTo(currentGeoPoint)
                     mapView.controller.setZoom(DEFAULT_ZOOM)
-
-                    // Met à jour le curseur dès la première position
                     locationOverlay.updateLocation(it)
                 }
             }
@@ -284,7 +260,6 @@ class MainActivity : AppCompatActivity(),
             Toast.makeText(this, "Permission de localisation requise", Toast.LENGTH_SHORT).show()
             return
         }
-
         tripData.isActive = true
         tripData.startTime = System.currentTimeMillis()
         lastUpdateTime = tripData.startTime
@@ -292,12 +267,7 @@ class MainActivity : AppCompatActivity(),
 
         btnStart.visibility = View.GONE
         layoutStopReset.visibility = View.VISIBLE
-
         startLocationUpdates()
-
-        // MODIFIÉ 4: Pas besoin de démarrer le timer, il tourne déjà
-        // timerHandler.post(timerRunnable)
-
         tvStatus.text = "COURSE EN COURS"
         Toast.makeText(this, "Course démarrée", Toast.LENGTH_SHORT).show()
     }
@@ -308,7 +278,6 @@ class MainActivity : AppCompatActivity(),
             tripData.updateWaitingTime(System.currentTimeMillis())
         }
         stopLocationUpdates()
-        // Le timer continue de tourner pour l'UI, on ne le stoppe pas
         notificationHelper.showTripCompletedNotification(
             tripData.distanceInKm,
             tripData.timeInMinutes,
@@ -334,22 +303,16 @@ class MainActivity : AppCompatActivity(),
             routePolyline?.setPoints(emptyList())
         }
         mapView.invalidate()
-
         btnStart.visibility = View.VISIBLE
         layoutStopReset.visibility = View.GONE
-
-        updateUI() // Mettre à jour l'UI immédiatement
+        updateUI()
         tvStatus.text = "PRÊT"
         Toast.makeText(this, "Compteur réinitialisé", Toast.LENGTH_SHORT).show()
     }
 
     private fun startLocationUpdates() {
         if (!hasLocationPermission()) return
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.requestLocationUpdates(
                 locationRequest,
                 locationCallback,
@@ -362,18 +325,25 @@ class MainActivity : AppCompatActivity(),
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
+    // ### CORRECTION DU BUG PRINCIPAL ###
     private fun onLocationUpdate(location: Location) {
-        if (!tripData.isActive) return
+        // Mettre à jour le curseur, même si la course n'est pas active
+        locationOverlay.updateLocation(location)
+
+        if (!tripData.isActive) {
+            // Si la course n'est pas active, on ne calcule rien
+            return
+        }
 
         val currentGeoPoint = GeoPoint(location.latitude, location.longitude)
-
-        // Met à jour la position de votre curseur personnalisé
-        locationOverlay.updateLocation(location)
 
         if (tripData.lastLocation != null) {
             val distance = DistanceCalculator.calculateDistance(tripData.lastLocation, location)
 
-            if (currentSpeed >= WAITING_SPEED_THRESHOLD && distance > 2) {
+            // CORRIGÉ : On ajoute la distance DÈS QU'ELLE EST SIGNIFICATIVE.
+            // La vitesse (currentSpeed) n'a pas d'importance ici,
+            // car le mode "attente" est géré par le timer.
+            if (distance > 2) {
                 tripData.distanceInMeters += distance
                 routePoints.add(currentGeoPoint)
 
@@ -386,6 +356,7 @@ class MainActivity : AppCompatActivity(),
                 routePolyline?.setPoints(routePoints)
             }
         } else {
+            // Premier point de localisation
             startMarker = Marker(mapView)
             startMarker?.position = currentGeoPoint
             startMarker?.title = "Départ"
@@ -395,56 +366,46 @@ class MainActivity : AppCompatActivity(),
         }
 
         tripData.lastLocation = location
+        // Le tarif est calculé ici avec la vitesse (currentSpeed)
         tripData.totalFare = tripData.calculateFareMaroc(currentSpeed)
+
         mapView.controller.animateTo(currentGeoPoint)
         mapView.controller.setZoom(DEFAULT_ZOOM)
         mapView.invalidate()
-
-        // updateUI() est déjà appelé par le timer, pas besoin de le mettre ici
     }
 
-    // MODIFIÉ 5: Logique de Jour/Nuit déplacée ici
+    // ### CORRECTION DU BUG D'AFFICHAGE ###
     private fun updateUI() {
-        // Format avec style 7 segments (zéros devant)
         tvTotalFare.text = String.format("%06.2f", tripData.totalFare)
         tvDistance.text = String.format("%05.2f", tripData.distanceInKm)
 
         val minutes = tripData.timeInSeconds / 60
         val seconds = tripData.timeInSeconds % 60
         tvTime.text = String.format("%02d:%02d", minutes, seconds)
-
-        // Update speed
         tvSpeed.text = String.format("VITESSE: %.0f KM/H", currentSpeed)
 
-        // --- LOGIQUE AJOUTÉE (DE updateRatesDisplay) ---
-        // Calcule l'heure actuelle à chaque seconde
         val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-        val isNight = hour < 6 || hour >= 20 // 20h00 à 5h59
-        val fareKm = if (isNight) "9.50" else "7.50"
+        val isNight = hour < 6 || hour >= 20
 
-        // Met à jour le texte des tarifs
-        tvRates.text = "Base: 7 DH | ${if (isNight) "Nuit" else "Jour"}: $fareKm/km | Attente: 15/h"
-        // --- FIN DE LA LOGIQUE AJOUTÉE ---
+        // CORRIGÉ : Utiliser les mêmes tarifs que TripData.kt
+        // val fareKm = if (isNight) "9.50" else "7.50" // Ancien code (incorrect)
+        val fareKm = if (isNight) "5.50" else "3.50" // Nouveau code (correct)
 
-        // Update mode avec couleurs appropriées
+        // CORRIGÉ : Afficher le "StartingFee" et non le "MinimumFare"
+        // tvRates.text = "Base: 7 DH | ${...}" // Ancien code (incorrect)
+        tvRates.text = "Départ: 2 DH | ${if (isNight) "Nuit" else "Jour"}: $fareKm/km | Attente: 15/h"
+        // --- FIN DE LA CORRECTION ---
+
         if (tripData.isWaiting) {
             tvTariffMode.text = "MODE: ATTENTE"
             tvTariffMode.setTextColor(ContextCompat.getColor(this, R.color.red))
             tvTariffMode.setShadowLayer(10f, 0f, 0f, ContextCompat.getColor(this, R.color.red))
         } else {
-            // Utilise les variables 'isNight' que nous venons de calculer
             tvTariffMode.text = if (isNight) "MODE: NUIT" else "MODE: JOUR"
             tvTariffMode.setTextColor(ContextCompat.getColor(this, R.color.green))
             tvTariffMode.setShadowLayer(10f, 0f, 0f, ContextCompat.getColor(this, R.color.green))
         }
     }
-
-    // SUPPRIMÉ : Cette fonction est maintenant intégrée dans updateUI()
-    /*
-    private fun updateRatesDisplay() {
-        ...
-    }
-    */
 
     private fun showStopConfirmationDialog() {
         AlertDialog.Builder(this)
@@ -455,25 +416,16 @@ class MainActivity : AppCompatActivity(),
                         "Temps d'attente: ${tripData.waitingTimeMinutes} min\n\n" +
                         "Tarif total: ${String.format("%.2f", tripData.totalFare)} DH"
             )
-            .setPositiveButton("OUI") { _, _ ->
-                stopTrip()
-            }
+            .setPositiveButton("OUI") { _, _ -> stopTrip() }
             .setNegativeButton("NON", null)
             .show()
     }
 
     private fun hasLocationPermission(): Boolean {
-        return ActivityCompat.checkSelfPermission(
-            this,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
     }
@@ -491,22 +443,18 @@ class MainActivity : AppCompatActivity(),
         if (tripData.isActive) {
             stopTrip()
         }
-        // Arrêter le timer quand l'activité est détruite
         timerHandler.removeCallbacks(timerRunnable)
     }
 
     override fun onResume() {
         super.onResume()
         mapView.onResume()
-        // Assurez-vous que le timer est en cours si l'activité reprend
-        timerHandler.removeCallbacks(timerRunnable) // Éviter les doublons
-        timerHandler.post(timerRunnable) // Redémarrer
+        timerHandler.removeCallbacks(timerRunnable)
+        timerHandler.post(timerRunnable)
     }
 
     override fun onPause() {
         super.onPause()
         mapView.onPause()
-        // Il est bon de stopper le timer quand l'app est en pause
-        // timerHandler.removeCallbacks(timerRunnable) // Décommentez si vous voulez économiser la batterie
     }
 }

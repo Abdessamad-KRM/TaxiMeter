@@ -1,1 +1,10 @@
-/build
+# Fichiers de configuration locaux
+local.properties
+
+# Fichiers sensibles
+*.keystore
+
+# Fichiers générés par l'IDE
+.idea/
+.gradle/
+build/

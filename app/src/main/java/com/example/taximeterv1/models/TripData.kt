@@ -4,7 +4,6 @@ package com.example.taximeterv1.models
 import android.location.Location
 import java.util.Calendar
 
-
 data class TripData(
     var distanceInMeters: Float = 0f,
     var timeInSeconds: Long = 0L,
@@ -53,6 +52,7 @@ data class TripData(
         val minimumFare = 7.00        // Le prix plancher (votre ancien "baseFare")
         val startingFee = 2.00        // La vraie prise en charge (frais de départ)
 
+        // CORRIGÉ : Tarifs harmonisés
         val farePerKmDay = 3.50       // Tarif jour
         val farePerKmNight = 5.50     // Tarif nuit
         val farePerHourWaiting = 15.00  // Tarif attente (DH/heure)
